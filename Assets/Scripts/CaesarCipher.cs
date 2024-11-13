@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -18,7 +18,9 @@ public class CaesarCipher
     public CaesarCipher()
     {
         RussianSymbols = new List<char> {
-            'à', 'á', 'â', 'ã', 'ä', 'å', '¸', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ğ', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', '÷', 'ø', 'ù', 'ú', 'û', 'ü', 'ı', 'ş', 'ÿ',
+            'Ğ°', 'Ğ±', 'Ğ²', 'Ğ³', 'Ğ´', 'Ğµ', 'Ñ‘', 'Ğ¶', 'Ğ·', 'Ğ¸', 
+            'Ğ¹', 'Ğº', 'Ğ»', 'Ğ¼', 'Ğ½','Ğ¾','Ğ¿','Ñ€','Ñ','Ñ‚', 'Ñƒ', 
+            'Ñ„','Ñ…', 'Ñ†', 'Ñ‡', 'Ñˆ', 'Ñ‰','ÑŠ','Ñ‹','ÑŒ','Ñ','Ñ','Ñ',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
         };
         EnglishSymbols = new List<char> {
@@ -51,7 +53,7 @@ public class CaesarCipher
                         cipheredText += englishSymbols[shiftedIndex];
                         break;
                     case Languages.Russian:
-                        shiftedIndex = englishSymbols.IndexOf(c);
+                        shiftedIndex = russianSymbols.IndexOf(c);
                         if (key + shiftedIndex < 0)
                         {
                             shiftedIndex = (shiftedIndex + key) % russianSymbols.Count + russianSymbols.Count;
@@ -100,7 +102,7 @@ public class CaesarCipher
                         cipheredText += englishSymbols[shiftedIndex];
                         break;
                     case Languages.Russian:
-                        shiftedIndex = englishSymbols.IndexOf(c);
+                        shiftedIndex = russianSymbols.IndexOf(c);
                         if (shiftedIndex - key < 0)
                         {
                             shiftedIndex = (shiftedIndex - key) % russianSymbols.Count + russianSymbols.Count;
@@ -131,7 +133,7 @@ public class CaesarCipher
             switch (language)
             {    
                 case Languages.English:
-                    if (!char.IsLetterOrDigit(c))
+                    if (char.IsLetter(c))
                     {
                         if (Regex.IsMatch(c.ToString(), @"\p{IsCyrillic}"))
                         {
@@ -140,7 +142,7 @@ public class CaesarCipher
                     }
                     break;
                 case Languages.Russian:
-                    if (!char.IsLetterOrDigit(c))
+                    if (char.IsLetter(c))
                     {
                         if (Regex.IsMatch(c.ToString(), @"\p{IsBasicLatin}"))
                         {
@@ -149,7 +151,7 @@ public class CaesarCipher
                     }
                     break;
                 case Languages.NotDecided:
-                    if (!char.IsLetterOrDigit(c))
+                    if (char.IsLetter(c))
                     {
                         if (Regex.IsMatch(c.ToString(), @"\p{IsCyrillic}"))
                         {
