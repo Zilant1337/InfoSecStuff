@@ -23,8 +23,11 @@ public class ModeManagerScript : MonoBehaviour
     public void SwitchMode(GameObject newMode)
     {
         currentMode?.SetActive(false);
-        currentMode = newMode;
-        currentMode.SetActive(true);
+        if(newMode!=currentMode)
+        {
+            currentMode = newMode;
+            currentMode.SetActive(true);
+        }
     }
 
     void Start()
@@ -158,6 +161,17 @@ public class ModeManagerScript : MonoBehaviour
         {
             outputFile.Write(inputField.text);
         }
+    }
+    public void CrackCode()
+    {
+        string text = crackingMode.GetComponent<CrackingScript>().TextField.text;
+        int possibleKey = cipherObject.GetKeyWithStatsSimplified(text);
+        crackingMode.GetComponent<CrackingScript>().KeyField.text = possibleKey.ToString();
+        crackingMode.GetComponent<CrackingScript>().TextField.text = cipherObject.CipherText(text, possibleKey);
+        //This is the long and most likely broken version
+        /*int likelyKey = cipherObject.GetKeyWithStats(crackingMode.GetComponent<CrackingScript>().TextField.text);
+        crackingMode.GetComponent<CrackingScript>().KeyField.text = likelyKey.ToString();
+        crackingMode.GetComponent<CrackingScript>().TextField.text = cipherObject.CipherText(crackingMode.GetComponent<CrackingScript>().TextField.text,likelyKey);*/
     }
     private string GetText(string path)
     {
