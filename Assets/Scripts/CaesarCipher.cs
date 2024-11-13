@@ -167,7 +167,7 @@ public class CaesarCipher
         }
         return language;
     }
-    static string RemoveWhitespace(string str)
+    static public string RemoveWhitespace(string str)
     {
         return Regex.Replace(str, @"\s+", "");
     }
