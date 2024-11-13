@@ -42,7 +42,7 @@ public class CaesarCipher
                 {
                     case Languages.English:
                         shiftedIndex = englishSymbols.IndexOf(c);
-                        if (key + shiftedIndex < 0)
+                        if ((shiftedIndex + key) % englishSymbols.Count < 0)
                         {
                             shiftedIndex = (shiftedIndex + key) % englishSymbols.Count + englishSymbols.Count;
                         }
@@ -54,7 +54,7 @@ public class CaesarCipher
                         break;
                     case Languages.Russian:
                         shiftedIndex = russianSymbols.IndexOf(c);
-                        if (key + shiftedIndex < 0)
+                        if ((shiftedIndex + key) % russianSymbols.Count < 0)
                         {
                             shiftedIndex = (shiftedIndex + key) % russianSymbols.Count + russianSymbols.Count;
                         }
@@ -91,7 +91,7 @@ public class CaesarCipher
                 {
                     case Languages.English:
                         shiftedIndex = englishSymbols.IndexOf(c);
-                        if (shiftedIndex - key < 0)
+                        if ((shiftedIndex - key) % englishSymbols.Count < 0)
                         {
                             shiftedIndex = (shiftedIndex - key) % englishSymbols.Count + englishSymbols.Count;
                         }
@@ -103,7 +103,7 @@ public class CaesarCipher
                         break;
                     case Languages.Russian:
                         shiftedIndex = russianSymbols.IndexOf(c);
-                        if (shiftedIndex - key < 0)
+                        if ((shiftedIndex - key) % russianSymbols.Count < 0)
                         {
                             shiftedIndex = (shiftedIndex - key) % russianSymbols.Count + russianSymbols.Count;
                         }

@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class ModeManagerScript : MonoBehaviour
 {
@@ -38,7 +40,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         catch
         {
-            Debug.Log("Ciphru vvedi eblan");
+            Debug.Log("Key is not a valid number, try again");
         }
         try
         {
@@ -46,7 +48,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         catch
         {
-            Debug.Log("Error when ciphering");
+            Debug.Log("Ciphering unsuccessful");
         }
     }
     public void DecipherBasicInput()
@@ -60,7 +62,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         catch
         {
-            Debug.Log("Ciphru vvedi eblan");
+            Debug.Log("Key is not a valid number, try again");
         }
         try
         {
@@ -68,7 +70,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         catch
         {
-            Debug.Log("Error when deciphering");
+            Debug.Log("Deciphering unsuccessful");
         }
     }
 }
