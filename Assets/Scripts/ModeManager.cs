@@ -50,7 +50,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         try
         {
-            basicCipherMode.GetComponent<BasicCipherScript>().TextField.text = cipherObject.CipherText(text, key);
+            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.CipherText(text, key);
         }
         catch
         {
@@ -72,7 +72,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         try
         {
-            basicCipherMode.GetComponent<BasicCipherScript>().TextField.text = cipherObject.DecipherText(text, key);
+            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.DecipherText(text, key);
         }
         catch
         {
@@ -94,7 +94,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         try
         {
-            fileCipherMode.GetComponent<FileCipherScript>().TextField.text = cipherObject.CipherText(text, key);
+            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.CipherText(text, key);
         }
         catch
         {
@@ -116,7 +116,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         try
         {
-            fileCipherMode.GetComponent<FileCipherScript>().TextField.text = cipherObject.DecipherText(text, key);
+            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.DecipherText(text, key);
         }
         catch
         {
@@ -136,7 +136,7 @@ public class ModeManagerScript : MonoBehaviour
         Debug.Log(fileText);
         try
         {
-            string formatedText = CaesarCipher.RemoveWhitespace(fileText.ToLower());
+            string formatedText = fileText.ToLower();
             if (cipherObject.CheckLanguage(formatedText) ==CaesarCipher.Languages.Russian|| cipherObject.CheckLanguage(fileText) == CaesarCipher.Languages.English)
             {
                 inputField.text = formatedText;
@@ -167,7 +167,7 @@ public class ModeManagerScript : MonoBehaviour
         string text = crackingMode.GetComponent<CrackingScript>().TextField.text;
         int possibleKey = cipherObject.GetKeyWithStatsSimplified(text);
         crackingMode.GetComponent<CrackingScript>().KeyField.text = possibleKey.ToString();
-        crackingMode.GetComponent<CrackingScript>().TextField.text = cipherObject.CipherText(text, possibleKey);
+        crackingMode.GetComponent<CrackingScript>().OutputField.text = cipherObject.CipherText(text, possibleKey);
         //This is the long and most likely broken version
         /*int likelyKey = cipherObject.GetKeyWithStats(crackingMode.GetComponent<CrackingScript>().TextField.text);
         crackingMode.GetComponent<CrackingScript>().KeyField.text = likelyKey.ToString();

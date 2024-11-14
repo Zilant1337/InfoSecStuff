@@ -116,7 +116,7 @@ public class CaesarCipher
     }
     public string CipherText(string text, int key)
     {
-        string formatedText = RemoveWhitespace(text.ToLower());
+        string formatedText = text.ToLower();
         Languages textLanguage = CheckLanguage(text);
 
         string cipheredText = "";
@@ -164,7 +164,7 @@ public class CaesarCipher
     }
     public string DecipherText(string text, int key)
     {
-        string formatedText = RemoveWhitespace(text.ToLower());
+        string formatedText = text.ToLower();
         Languages textLanguage = CheckLanguage(text);
 
         string cipheredText = "";
