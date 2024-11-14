@@ -7,6 +7,7 @@ using static UnityEngine.Rendering.DebugUI;
 using AnotherFileBrowser.Windows;
 using System.IO;
 using UnityEngine.Networking;
+using System.Numerics;
 
 public class ModeManagerScript : MonoBehaviour
 {
@@ -18,7 +19,15 @@ public class ModeManagerScript : MonoBehaviour
     private GameObject crackingMode;
     [SerializeField]
     private GameObject currentMode;
+    [SerializeField]
+    private TMP_Dropdown languageDropDown;
+    [SerializeField]
+    private GameObject Errorscreen;
+
+    [SerializeField]
+    private TMP_Text errortext;
     public CaesarCipher cipherObject;
+    public CaesarCipher.Languages language;
 
     public void SwitchMode(GameObject newMode)
     {
@@ -32,6 +41,7 @@ public class ModeManagerScript : MonoBehaviour
 
     void Start()
     {
+        language = CaesarCipher.Languages.NotDecided;
         currentMode = null;
         cipherObject = new CaesarCipher();
     }
@@ -39,88 +49,95 @@ public class ModeManagerScript : MonoBehaviour
     {
         string text = basicCipherMode.GetComponent<BasicCipherScript>().TextField.text;
         string keyString = basicCipherMode.GetComponent<BasicCipherScript>().KeyField.text;
-        int key = 0;
+        BigInteger key = 0;
         try
         {
-            key = int.Parse(keyString);
+            key = BigInteger.Parse(keyString);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Key is not a valid number, try again");
+            DisplayError(e.Message);
+            return;
         }
         try
         {
-            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.CipherText(text, key);
+            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.CipherText(text, key, language);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Ciphering unsuccessful");
+            DisplayError(e.Message);
+            return;
         }
     }
     public void DecipherBasicInput()
     {
         string text = basicCipherMode.GetComponent<BasicCipherScript>().TextField.text;
         string keyString = basicCipherMode.GetComponent<BasicCipherScript>().KeyField.text;
-        int key = 0;
+        BigInteger key = 0;
         try
         {
-            key = int.Parse(keyString);
+            key = BigInteger.Parse(keyString);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Key is not a valid number, try again");
+            DisplayError(e.Message);
+            return;
         }
         try
         {
-            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.DecipherText(text, key);
+            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Deciphering unsuccessful");
+            DisplayError(e.Message);
+            return;
         }
     }
     public void CipherFileInput()
     {
         string text = fileCipherMode.GetComponent<FileCipherScript>().TextField.text;
         string keyString = fileCipherMode.GetComponent<FileCipherScript>().KeyField.text;
-        int key = 0;
+        BigInteger key = 0;
         try
         {
-            key = int.Parse(keyString);
+            key = BigInteger.Parse(keyString);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Key is not a valid number, try again");
+            DisplayError(e.Message);
         }
         try
         {
-            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.CipherText(text, key);
+            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.CipherText(text, key,language);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Ciphering unsuccessful");
+            DisplayError(e.Message);
+            return;
         }
     }
     public void DecipherFileInput()
     {
         string text = fileCipherMode.GetComponent<FileCipherScript>().TextField.text;
         string keyString = fileCipherMode.GetComponent<FileCipherScript>().KeyField.text;
-        int key = 0;
+        BigInteger key = 0;
         try
         {
-            key = int.Parse(keyString);
+            key = BigInteger.Parse(keyString);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Key is not a valid number, try again");
+            DisplayError(e.Message);
+            return;
         }
         try
         {
-            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.DecipherText(text, key);
+            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Deciphering unsuccessful");
+            DisplayError(e.Message);
+            return;
         }
     }
     public void GetTextFromFile(TMP_InputField inputField)
@@ -142,9 +159,10 @@ public class ModeManagerScript : MonoBehaviour
                 inputField.text = formatedText;
             }
         }
-        catch
+        catch (Exception e)
         {
-            Debug.Log("Error reading file, probably mixed languages");
+            DisplayError(e.Message);
+            return;
         }
     }
     public void SaveTextToFile(TMP_InputField inputField)
@@ -165,9 +183,18 @@ public class ModeManagerScript : MonoBehaviour
     public void CrackCode()
     {
         string text = crackingMode.GetComponent<CrackingScript>().TextField.text;
-        int possibleKey = cipherObject.GetKeyWithStatsSimplified(text);
-        crackingMode.GetComponent<CrackingScript>().KeyField.text = possibleKey.ToString();
-        crackingMode.GetComponent<CrackingScript>().OutputField.text = cipherObject.CipherText(text, possibleKey);
+        int possibleKey = cipherObject.GetKeyWithStatsSimplified(text, language);
+        try
+        {
+            
+            crackingMode.GetComponent<CrackingScript>().KeyField.text = possibleKey.ToString();
+            crackingMode.GetComponent<CrackingScript>().OutputField.text = cipherObject.CipherText(text, possibleKey, language);
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+            return;
+        }
         //This is the long and most likely broken version
         /*int likelyKey = cipherObject.GetKeyWithStats(crackingMode.GetComponent<CrackingScript>().TextField.text);
         crackingMode.GetComponent<CrackingScript>().KeyField.text = likelyKey.ToString();
@@ -180,5 +207,32 @@ public class ModeManagerScript : MonoBehaviour
         streamReader.Close();
         return text;
     }
-
+    public void ChangeLanguage()
+    {
+        string dropdownText = languageDropDown.options[languageDropDown.value].text;
+        switch (dropdownText)
+        {
+            case "English":
+                language = CaesarCipher.Languages.English;
+                Debug.Log("Switched to english");
+                break;
+            case "Russian":
+                language = CaesarCipher.Languages.Russian;
+                Debug.Log("Switched to russian");
+                break;
+            case "Autodetect":
+                language = CaesarCipher.Languages.NotDecided;
+                Debug.Log("Switched to autodetect");
+                break;
+        }
+    }
+    public void DisplayError(string text)
+    {
+        errortext.text = text;
+        Errorscreen.SetActive(true);
+    }
+    public void CloseErrorScreen()
+    {
+        Errorscreen.SetActive(false);
+    }
 }

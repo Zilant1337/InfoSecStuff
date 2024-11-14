@@ -2,9 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static Unity.VisualScripting.Icons;
 
 public class CaesarCipher
 {
@@ -114,19 +116,30 @@ public class CaesarCipher
                 { 'z', 0.00074 }
             };
     }
-    public string CipherText(string text, int key)
+    public string CipherText(string text, BigInteger key, Languages language)
     {
         string formatedText = text.ToLower();
-        Languages textLanguage = CheckLanguage(text);
-
+        Languages textLanguage = language;
+        if (textLanguage == Languages.NotDecided)
+        {
+            textLanguage = CheckLanguage(formatedText);
+            if (textLanguage == Languages.NotDecided)
+            {
+                throw new System.Exception("Please specify the language");
+            }
+        }
         string cipheredText = "";
         foreach(char c in formatedText)
         {
             if(char.IsLetterOrDigit(c)){
-            int shiftedIndex;
+                BigInteger shiftedIndex;
                 switch (textLanguage)
                 {
                     case Languages.English:
+                        if (CheckLanguage(c.ToString()) != Languages.English && char.IsLetter(c))
+                        {
+                            throw new Exception("Language inconsistency");
+                        }
                         shiftedIndex = englishSymbolsWithNumbers.IndexOf(c);
                         if ((shiftedIndex + key) % englishSymbolsWithNumbers.Count < 0)
                         {
@@ -136,9 +149,13 @@ public class CaesarCipher
                         {
                             shiftedIndex = (shiftedIndex + key) % englishSymbolsWithNumbers.Count;
                         }
-                        cipheredText += englishSymbolsWithNumbers[shiftedIndex];
+                        cipheredText += englishSymbolsWithNumbers[(int)shiftedIndex];
                         break;
                     case Languages.Russian:
+                        if (CheckLanguage(c.ToString()) != Languages.Russian && char.IsLetter(c))
+                        {
+                            throw new Exception("Language inconsistency");
+                        }
                         shiftedIndex = russianSymbolsWithNumbers.IndexOf(c);
                         if ((shiftedIndex + key) % russianSymbolsWithNumbers.Count < 0)
                         {
@@ -148,7 +165,7 @@ public class CaesarCipher
                         {
                             shiftedIndex = (shiftedIndex + key) % russianSymbolsWithNumbers.Count;
                         }
-                        cipheredText += russianSymbolsWithNumbers[shiftedIndex];
+                        cipheredText += russianSymbolsWithNumbers[(int)shiftedIndex];
                         break;
                     case Languages.NotDecided:
                         throw new System.Exception("Language undecided");
@@ -157,25 +174,37 @@ public class CaesarCipher
             }
             else
             {
-                cipheredText += c;
+                throw new System.Exception("Symbol Detectes");
             }
         }
         return cipheredText;
     }
-    public string DecipherText(string text, int key)
+    public string DecipherText(string text, BigInteger key, Languages language)
     {
         string formatedText = text.ToLower();
-        Languages textLanguage = CheckLanguage(text);
+        Languages textLanguage = language;
+        if (textLanguage == Languages.NotDecided)
+        {
+            textLanguage = CheckLanguage(formatedText);
+            if (textLanguage == Languages.NotDecided)
+            {
+                throw new System.Exception("Please specify the language");
+            }
+        }
 
         string cipheredText = "";
         foreach (char c in formatedText)
         {
             if (char.IsLetterOrDigit(c))
             {
-                int shiftedIndex;
+                BigInteger shiftedIndex;
                 switch (textLanguage)
                 {
                     case Languages.English:
+                        if(CheckLanguage(c.ToString())!= Languages.English&&char.IsLetter(c))
+                        {
+                            throw new Exception("Language inconsistency");
+                        }
                         shiftedIndex = englishSymbolsWithNumbers.IndexOf(c);
                         if ((shiftedIndex - key) % englishSymbolsWithNumbers.Count < 0)
                         {
@@ -185,9 +214,13 @@ public class CaesarCipher
                         {
                             shiftedIndex = (shiftedIndex - key) % englishSymbolsWithNumbers.Count;
                         }
-                        cipheredText += englishSymbolsWithNumbers[shiftedIndex];
+                        cipheredText += englishSymbolsWithNumbers[(int)shiftedIndex];
                         break;
                     case Languages.Russian:
+                        if (CheckLanguage(c.ToString()) != Languages.Russian && char.IsLetter(c))
+                        {
+                            throw new Exception("Language inconsistency");
+                        }
                         shiftedIndex = russianSymbolsWithNumbers.IndexOf(c);
                         if ((shiftedIndex - key) % russianSymbolsWithNumbers.Count < 0)
                         {
@@ -197,7 +230,7 @@ public class CaesarCipher
                         {
                             shiftedIndex = (shiftedIndex - key) % russianSymbolsWithNumbers.Count;
                         }
-                        cipheredText += russianSymbolsWithNumbers[shiftedIndex];
+                        cipheredText += russianSymbolsWithNumbers[(int)shiftedIndex];
                         break;
                     case Languages.NotDecided:
                         throw new System.Exception("Language undecided");
@@ -206,7 +239,7 @@ public class CaesarCipher
             }
             else
             {
-                cipheredText += c;
+                throw new System.Exception("Symbol Detected");
             }
         }
         return cipheredText;
@@ -216,6 +249,10 @@ public class CaesarCipher
         Languages language = Languages.NotDecided;
         foreach(char c in text)
         {
+            if (!char.IsLetterOrDigit(c))
+            {
+                throw new System.Exception("Non-letter detected");
+            }
             switch (language)
             {    
                 case Languages.English:
@@ -253,10 +290,19 @@ public class CaesarCipher
         }
         return language;
     }
-    public int GetKeyWithStatsSimplified(string text)
+    public int GetKeyWithStatsSimplified(string text,Languages language)
     {
         int possibleKey = 0;
-        Languages language = CheckLanguage(text);
+        Languages textLanguage = language;
+        if (textLanguage == Languages.NotDecided)
+        {
+            textLanguage = CheckLanguage(text);
+            if (textLanguage == Languages.NotDecided)
+            {
+                throw new System.Exception("Please specify the language");
+            }
+        }
+        Debug.Log(textLanguage.ToString());
         Dictionary<char, int> letterCounts = new Dictionary<char, int>();
         foreach (char c in text)
         {
@@ -279,9 +325,11 @@ public class CaesarCipher
                 mostFrequentLetter = letter.Key;
             }
         }
-        switch (language)
+        Debug.Log(mostFrequentLetter);
+        switch (textLanguage)
         {
             case Languages.Russian:
+                Debug.Log($"MostFrequentLetter = {mostFrequentLetter}, key:{GetKeyBetweenLetters(mostFrequentLetter, mostFrequentRussianSymbol, language)}");
                 possibleKey = GetKeyBetweenLetters(mostFrequentLetter,mostFrequentRussianSymbol,language);
                 break;
             case Languages.English:
@@ -290,170 +338,7 @@ public class CaesarCipher
         }
         return possibleKey;
     }
-    public int GetKeyWithStats(string text)
-    {
-        Languages language = CheckLanguage(text);
-        int totalLetterCount = text.Length;
-        Dictionary<char,int> letterCounts = new Dictionary<char,int>();
-        foreach (char c in text)
-        {
-            if(char.IsLetter(c))
-            {
-                if (!letterCounts.ContainsKey(c))
-                {
-                    letterCounts.Add(c, 0);
-                }
-                letterCounts[c]++;
-            }
-        }
-        Dictionary<char,double> cipheredFrequencies = new Dictionary<char,double>();
-        foreach (var letter in letterCounts) 
-        {
-            cipheredFrequencies.Add(letter.Key, letter.Value/totalLetterCount);
-        }
-        Dictionary<int,int> probableKeys = new Dictionary<int,int>();
-        switch (language)
-        {
-            case Languages.English:
-                
-                foreach(var letter in cipheredFrequencies)
-                {
-                    int probableKey = 0;
-                    double closestDiff = double.MaxValue;
-                    foreach (var baseLetter in englishFrequencies)
-                    {
-                        if (Math.Abs(letter.Value - baseLetter.Value) < closestDiff)
-                        {
-                            closestDiff = Math.Abs(letter.Value - baseLetter.Value);
-                            probableKey = GetShortestKeyBetweenLetters(letter.Key,baseLetter.Key, language);
-                        }
-                    }
-                    if (!probableKeys.ContainsKey(probableKey))
-                    {
-                        probableKeys.Add(probableKey, 0);
-                    }
-                    probableKeys[probableKey]++;
-                }
-                break;
-            case Languages.Russian:
-                foreach (var letter in cipheredFrequencies)
-                {
-                    int probableKey = 0;
-                    double closestDiff = double.MaxValue;
-                    foreach (var baseLetter in russianFrequencies)
-                    {
-                        if (Math.Abs(letter.Value - baseLetter.Value) < closestDiff)
-                        {
-                            closestDiff = Math.Abs(letter.Value - baseLetter.Value);
-                            probableKey = GetShortestKeyBetweenLetters(letter.Key, baseLetter.Key,language);
-                        }
-                    }
-                    if (!probableKeys.ContainsKey(probableKey))
-                    {
-                        probableKeys.Add(probableKey, 0);
-                    }
-                    probableKeys[probableKey]++;
-                }
-                break;
-        }
-        int highestProbability = -1;
-        int likelyKey = -1;
-        foreach (var key in probableKeys)
-        {
-            if (highestProbability<key.Value)
-            {
-                highestProbability = key.Value; likelyKey = key.Key;
-            }
-        }
-        return likelyKey;
-    }
-    public int GetShortestKeyBetweenLetters(char letter1,char letter2, Languages language)
-    {
-        switch (language)
-        {
-            case Languages.English:
-                char newLetter1Eng = letter1;
-                char newLetter2Eng = letter2;
-                int forwardDistEng = 0;
-                int backwardDistEng = 0;
-                //Moving forward through the array
-                while (newLetter1Eng != newLetter2Eng)
-                {
-                    if (englishSymbolsWithoutNumbers.IndexOf(newLetter1Eng)+1 != englishSymbolsWithoutNumbers.Count)
-                    {
-                        forwardDistEng++;
-                        newLetter1Eng = englishSymbolsWithoutNumbers[englishSymbolsWithoutNumbers.IndexOf(newLetter1Eng) + 1];
-                    }
-                    else
-                    {
-                        forwardDistEng++;
-                        newLetter1Eng = englishSymbolsWithoutNumbers[0];
-                    }
-                }
-                //Moving backwards
-                while (newLetter1Eng != newLetter2Eng)
-                {
-                    if (englishSymbolsWithoutNumbers.IndexOf(newLetter1Eng) - 1 != -1)
-                    {
-                        backwardDistEng++;
-                        newLetter1Eng = englishSymbolsWithoutNumbers[englishSymbolsWithoutNumbers.IndexOf(newLetter1Eng) - 1];
-                    }
-                    else
-                    {
-                        backwardDistEng++;
-                        newLetter1Eng = englishSymbolsWithoutNumbers[englishSymbolsWithoutNumbers.Count-1];
-                    }
-                }
-                int shortestDistEng = Math.Min(forwardDistEng, backwardDistEng);
-                if(shortestDistEng == backwardDistEng)
-                {
-                    shortestDistEng = -shortestDistEng;
-                }
-                return shortestDistEng;
-                break;
-            case Languages.Russian:
-                int forwardDistRus = 0;
-                int backwardDistRus = 0;
-                char newLetter1Rus = letter1;
-                char newLetter2Rus = letter2;
-                //Moving forward through the array
-                while (newLetter1Rus != newLetter2Rus)
-                {
-                    if (englishSymbolsWithoutNumbers.IndexOf(newLetter1Rus) + 1 != englishSymbolsWithoutNumbers.Count)
-                    {
-                        forwardDistRus++;
-                        newLetter1Rus = englishSymbolsWithoutNumbers[englishSymbolsWithoutNumbers.IndexOf(newLetter1Rus) + 1];
-                    }
-                    else
-                    {
-                        forwardDistRus++;
-                        newLetter1Rus = englishSymbolsWithoutNumbers[0];
-                    }
-                }
-                //Moving backwards
-                while (newLetter1Rus != newLetter2Rus)
-                {
-                    if (englishSymbolsWithoutNumbers.IndexOf(newLetter1Rus) - 1 != -1)
-                    {
-                        backwardDistRus++;
-                        newLetter1Rus = englishSymbolsWithoutNumbers[englishSymbolsWithoutNumbers.IndexOf(newLetter1Rus) - 1];
-                    }
-                    else
-                    {
-                        backwardDistRus++;
-                        newLetter1Rus = englishSymbolsWithoutNumbers[englishSymbolsWithoutNumbers.Count - 1];
-                    }
-                }
-                int shortestDistRus = Math.Min(forwardDistRus, backwardDistRus);
-                if (shortestDistRus == backwardDistRus)
-                {
-                    shortestDistRus = -shortestDistRus;
-                }
-                return shortestDistRus;
-                break;
-        }
-        return -1;
-    }
+    
     public int GetKeyBetweenLetters(char letter1, char letter2, Languages language)
     {
         int firstKey = 0;
