@@ -116,8 +116,9 @@ public class CaesarCipher
                 { 'z', 0.00074 }
             };
     }
-    public string CipherText(string text, BigInteger key, Languages language)
+    public string CipherText(string text, string keyString, Languages language)
     {
+        BigInteger key = BigInteger.Parse(keyString);
         if (text == "")
         {
             throw new Exception("Please enter text");
@@ -183,8 +184,9 @@ public class CaesarCipher
         }
         return cipheredText;
     }
-    public string DecipherText(string text, BigInteger key, Languages language)
+    public string DecipherText(string text, string keyString, Languages language)
     {
+        BigInteger key = BigInteger.Parse(keyString);
         if (text == "")
         {
             throw new Exception("Please enter text");
@@ -298,7 +300,7 @@ public class CaesarCipher
         }
         return language;
     }
-    public int GetKeyWithStatsSimplified(string text,Languages language)
+    public int GetProbableKey(string text,Languages language)
     {
         if (text == "")
         {

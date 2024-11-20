@@ -1,5 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public abstract class Cipher
@@ -109,5 +112,124 @@ public abstract class Cipher
                 { 'y', 0.01974 },
                 { 'z', 0.00074 }
             };
+    }
+    public abstract string CipherText(string text, string keyString, Languages language);
+    public abstract string DecipherText(string text, string keyString, Languages language);
+    public Languages CheckLanguage(string text)
+    {
+        Languages language = Languages.NotDecided;
+        foreach (char c in text)
+        {
+            if (!char.IsLetterOrDigit(c))
+            {
+                throw new System.Exception("Non-letter detected");
+            }
+            switch (language)
+            {
+                case Languages.English:
+                    if (char.IsLetter(c))
+                    {
+                        if (Regex.IsMatch(c.ToString(), @"\p{IsCyrillic}"))
+                        {
+                            throw new System.Exception("Language inconsistency");
+                        }
+                    }
+                    break;
+                case Languages.Russian:
+                    if (char.IsLetter(c))
+                    {
+                        if (Regex.IsMatch(c.ToString(), @"\p{IsBasicLatin}"))
+                        {
+                            throw new System.Exception("Language inconsistency");
+                        }
+                    }
+                    break;
+                case Languages.NotDecided:
+                    if (char.IsLetter(c))
+                    {
+                        if (Regex.IsMatch(c.ToString(), @"\p{IsCyrillic}"))
+                        {
+                            language = Languages.Russian;
+                        }
+                        else if (Regex.IsMatch(c.ToString(), @"\p{IsBasicLatin}"))
+                        {
+                            language = Languages.English;
+                        }
+                    }
+                    break;
+            }
+        }
+        return language;
+    }
+    public int GetProbableKey(string text, Languages language)
+    {
+        if (text == "")
+        {
+            throw new Exception("Please enter text");
+        }
+        int possibleKey = 0;
+        Languages textLanguage = language;
+        if (textLanguage == Languages.NotDecided)
+        {
+            textLanguage = CheckLanguage(text);
+            if (textLanguage == Languages.NotDecided)
+            {
+                throw new System.Exception("Please specify the language");
+            }
+        }
+        Debug.Log(textLanguage.ToString());
+        Dictionary<char, int> letterCounts = new Dictionary<char, int>();
+        foreach (char c in text)
+        {
+            if (char.IsLetter(c))
+            {
+                if (!letterCounts.ContainsKey(c))
+                {
+                    letterCounts.Add(c, 0);
+                }
+                letterCounts[c]++;
+            }
+        }
+        int highestCount = -1;
+        char mostFrequentLetter = '_';
+        foreach (var letter in letterCounts)
+        {
+            if (highestCount < letter.Value)
+            {
+                highestCount = letter.Value;
+                mostFrequentLetter = letter.Key;
+            }
+        }
+        Debug.Log(mostFrequentLetter);
+        switch (textLanguage)
+        {
+            case Languages.Russian:
+                Debug.Log($"MostFrequentLetter = {mostFrequentLetter}, key:{GetKeyBetweenLetters(mostFrequentLetter, mostFrequentRussianSymbol, language)}");
+                possibleKey = GetKeyBetweenLetters(mostFrequentLetter, mostFrequentRussianSymbol, language);
+                break;
+            case Languages.English:
+                possibleKey = GetKeyBetweenLetters(mostFrequentLetter, mostFrequentEnglishSymbol, language);
+                break;
+        }
+        return possibleKey;
+    }
+
+    public int GetKeyBetweenLetters(char letter1, char letter2, Languages language)
+    {
+        int firstKey = 0;
+        switch (language)
+        {
+            case Languages.English:
+                firstKey = englishSymbolsWithNumbers.IndexOf(letter2) - englishSymbolsWithNumbers.IndexOf(letter1);
+                break;
+            case Languages.Russian:
+                firstKey = russianSymbolsWithNumbers.IndexOf(letter2) - russianSymbolsWithNumbers.IndexOf(letter1);
+                break;
+        }
+        return firstKey;
+    }
+    static public string RemoveWhitespace(string str)
+    {
+        return Regex.Replace(str, @"\s+", "");
     }
 }

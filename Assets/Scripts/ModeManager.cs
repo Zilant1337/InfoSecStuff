@@ -49,19 +49,9 @@ public class ModeManagerScript : MonoBehaviour
     {
         string text = basicCipherMode.GetComponent<ModeScript>().TextField.text;
         string keyString = basicCipherMode.GetComponent<ModeScript>().KeyField.text;
-        BigInteger key = 0;
         try
         {
-            key = BigInteger.Parse(keyString);
-        }
-        catch (Exception e)
-        {
-            DisplayError(e.Message);
-            return;
-        }
-        try
-        {
-            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, key, language);
+            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -73,19 +63,9 @@ public class ModeManagerScript : MonoBehaviour
     {
         string text = basicCipherMode.GetComponent<ModeScript>().TextField.text;
         string keyString = basicCipherMode.GetComponent<ModeScript>().KeyField.text;
-        BigInteger key = 0;
         try
         {
-            key = BigInteger.Parse(keyString);
-        }
-        catch (Exception e)
-        {
-            DisplayError(e.Message);
-            return;
-        }
-        try
-        {
-            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
+            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -97,19 +77,9 @@ public class ModeManagerScript : MonoBehaviour
     {
         string text = fileCipherMode.GetComponent<ModeScript>().TextField.text;
         string keyString = fileCipherMode.GetComponent<ModeScript>().KeyField.text;
-        BigInteger key = 0;
         try
         {
-            key = BigInteger.Parse(keyString);
-        }
-        catch (Exception e)
-        {
-            DisplayError(e.Message);
-            return; 
-        }
-        try
-        {
-            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, key,language);
+            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -121,19 +91,10 @@ public class ModeManagerScript : MonoBehaviour
     {
         string text = fileCipherMode.GetComponent<ModeScript>().TextField.text;
         string keyString = fileCipherMode.GetComponent<ModeScript>().KeyField.text;
-        BigInteger key = 0;
+
         try
         {
-            key = BigInteger.Parse(keyString);
-        }
-        catch (Exception e)
-        {
-            DisplayError(e.Message);
-            return;
-        }
-        try
-        {
-            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
+            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -208,10 +169,10 @@ public class ModeManagerScript : MonoBehaviour
             DisplayError(e.Message);
             return;
         }
-        int possibleKey = cipherObject.GetKeyWithStatsSimplified(text, language);
+        int possibleKey = cipherObject.GetProbableKey(text, language);
         try
         {
-            crackingMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, possibleKey, language);
+            crackingMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, possibleKey.ToString(), language);
             crackingMode.GetComponent<ModeScript>().KeyField.text = possibleKey.ToString();
         }
         catch (Exception e)
