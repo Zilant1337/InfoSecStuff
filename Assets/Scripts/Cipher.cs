@@ -7,14 +7,15 @@ using UnityEngine;
 
 public abstract class Cipher
 {
-    private List<char> russianSymbolsWithNumbers;
-    private List<char> englishSymbolsWithNumbers;
-    private List<char> russianSymbolsWithoutNumbers;
-    private List<char> englishSymbolsWithoutNumbers;
-    private Dictionary<char, double> russianFrequencies;
-    private Dictionary<char, double> englishFrequencies;
-    char mostFrequentRussianSymbol = 'о';
-    char mostFrequentEnglishSymbol = 'e';
+    protected List<char> russianSymbolsWithNumbers;
+    protected List<char> englishSymbolsWithNumbers;
+    protected List<char> russianSymbolsWithoutNumbers;
+    protected List<char> englishSymbolsWithoutNumbers;
+    protected Dictionary<char, double> russianFrequencies;
+    protected Dictionary<char, double> englishFrequencies;
+    protected char mostFrequentRussianSymbol = 'о';
+    protected char mostFrequentEnglishSymbol = 'e';
+    public Type keyType;
 
     public enum Languages
     {
@@ -115,6 +116,7 @@ public abstract class Cipher
     }
     public abstract string CipherText(string text, string keyString, Languages language);
     public abstract string DecipherText(string text, string keyString, Languages language);
+    public abstract string GetProbableKey(string text, Languages language);
     public Languages CheckLanguage(string text)
     {
         Languages language = Languages.NotDecided;
@@ -161,59 +163,6 @@ public abstract class Cipher
         }
         return language;
     }
-    public int GetProbableKey(string text, Languages language)
-    {
-        if (text == "")
-        {
-            throw new Exception("Please enter text");
-        }
-        int possibleKey = 0;
-        Languages textLanguage = language;
-        if (textLanguage == Languages.NotDecided)
-        {
-            textLanguage = CheckLanguage(text);
-            if (textLanguage == Languages.NotDecided)
-            {
-                throw new System.Exception("Please specify the language");
-            }
-        }
-        Debug.Log(textLanguage.ToString());
-        Dictionary<char, int> letterCounts = new Dictionary<char, int>();
-        foreach (char c in text)
-        {
-            if (char.IsLetter(c))
-            {
-                if (!letterCounts.ContainsKey(c))
-                {
-                    letterCounts.Add(c, 0);
-                }
-                letterCounts[c]++;
-            }
-        }
-        int highestCount = -1;
-        char mostFrequentLetter = '_';
-        foreach (var letter in letterCounts)
-        {
-            if (highestCount < letter.Value)
-            {
-                highestCount = letter.Value;
-                mostFrequentLetter = letter.Key;
-            }
-        }
-        Debug.Log(mostFrequentLetter);
-        switch (textLanguage)
-        {
-            case Languages.Russian:
-                Debug.Log($"MostFrequentLetter = {mostFrequentLetter}, key:{GetKeyBetweenLetters(mostFrequentLetter, mostFrequentRussianSymbol, language)}");
-                possibleKey = GetKeyBetweenLetters(mostFrequentLetter, mostFrequentRussianSymbol, language);
-                break;
-            case Languages.English:
-                possibleKey = GetKeyBetweenLetters(mostFrequentLetter, mostFrequentEnglishSymbol, language);
-                break;
-        }
-        return possibleKey;
-    }
-
     public int GetKeyBetweenLetters(char letter1, char letter2, Languages language)
     {
         int firstKey = 0;

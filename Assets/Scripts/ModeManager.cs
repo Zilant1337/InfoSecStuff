@@ -26,6 +26,7 @@ public class ModeManagerScript : MonoBehaviour
 
     [SerializeField]
     private TMP_Text errortext;
+    public Cipher currentCipher;
     public CaesarCipher cipherObject;
     public CaesarCipher.Languages language;
 
@@ -169,11 +170,12 @@ public class ModeManagerScript : MonoBehaviour
             DisplayError(e.Message);
             return;
         }
-        int possibleKey = cipherObject.GetProbableKey(text, language);
+        string possibleKey = cipherObject.GetProbableKey(text, language);
+
         try
         {
             crackingMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, possibleKey.ToString(), language);
-            crackingMode.GetComponent<ModeScript>().KeyField.text = possibleKey.ToString();
+            crackingMode.GetComponent<ModeScript>().KeyField.text = possibleKey;
         }
         catch (Exception e)
         {
