@@ -41,14 +41,14 @@ public class ModeManagerScript : MonoBehaviour
 
     void Start()
     {
-        language = CaesarCipher.Languages.NotDecided;
+        language = CaesarCipher.Languages.Russian;
         currentMode = null;
         cipherObject = new CaesarCipher();
     }
     public void CipherBasicInput()
     {
-        string text = basicCipherMode.GetComponent<BasicCipherScript>().TextField.text;
-        string keyString = basicCipherMode.GetComponent<BasicCipherScript>().KeyField.text;
+        string text = basicCipherMode.GetComponent<ModeScript>().TextField.text;
+        string keyString = basicCipherMode.GetComponent<ModeScript>().KeyField.text;
         BigInteger key = 0;
         try
         {
@@ -61,7 +61,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         try
         {
-            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.CipherText(text, key, language);
+            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, key, language);
         }
         catch (Exception e)
         {
@@ -71,8 +71,8 @@ public class ModeManagerScript : MonoBehaviour
     }
     public void DecipherBasicInput()
     {
-        string text = basicCipherMode.GetComponent<BasicCipherScript>().TextField.text;
-        string keyString = basicCipherMode.GetComponent<BasicCipherScript>().KeyField.text;
+        string text = basicCipherMode.GetComponent<ModeScript>().TextField.text;
+        string keyString = basicCipherMode.GetComponent<ModeScript>().KeyField.text;
         BigInteger key = 0;
         try
         {
@@ -85,7 +85,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         try
         {
-            basicCipherMode.GetComponent<BasicCipherScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
+            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
         }
         catch (Exception e)
         {
@@ -95,8 +95,8 @@ public class ModeManagerScript : MonoBehaviour
     }
     public void CipherFileInput()
     {
-        string text = fileCipherMode.GetComponent<FileCipherScript>().TextField.text;
-        string keyString = fileCipherMode.GetComponent<FileCipherScript>().KeyField.text;
+        string text = fileCipherMode.GetComponent<ModeScript>().TextField.text;
+        string keyString = fileCipherMode.GetComponent<ModeScript>().KeyField.text;
         BigInteger key = 0;
         try
         {
@@ -105,10 +105,11 @@ public class ModeManagerScript : MonoBehaviour
         catch (Exception e)
         {
             DisplayError(e.Message);
+            return; 
         }
         try
         {
-            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.CipherText(text, key,language);
+            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, key,language);
         }
         catch (Exception e)
         {
@@ -118,8 +119,8 @@ public class ModeManagerScript : MonoBehaviour
     }
     public void DecipherFileInput()
     {
-        string text = fileCipherMode.GetComponent<FileCipherScript>().TextField.text;
-        string keyString = fileCipherMode.GetComponent<FileCipherScript>().KeyField.text;
+        string text = fileCipherMode.GetComponent<ModeScript>().TextField.text;
+        string keyString = fileCipherMode.GetComponent<ModeScript>().KeyField.text;
         BigInteger key = 0;
         try
         {
@@ -132,7 +133,7 @@ public class ModeManagerScript : MonoBehaviour
         }
         try
         {
-            fileCipherMode.GetComponent<FileCipherScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
+            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, key, language);
         }
         catch (Exception e)
         {
@@ -150,7 +151,6 @@ public class ModeManagerScript : MonoBehaviour
         {
             fileText=GetText(path);
         });
-        Debug.Log(fileText);
         try
         {
             string formatedText = fileText.ToLower();
@@ -158,6 +158,7 @@ public class ModeManagerScript : MonoBehaviour
             {
                 inputField.text = formatedText;
             }
+            ClearAllFieldsInCurrentMode();
         }
         catch (Exception e)
         {
@@ -167,6 +168,18 @@ public class ModeManagerScript : MonoBehaviour
     }
     public void SaveTextToFile(TMP_InputField inputField)
     {
+        try
+        {
+            if (inputField.text == "")
+            {
+                throw new Exception("Please enter text");
+            }
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+            return;
+        }
         string selectedPath="";
         BrowserProperties browserProperties = new BrowserProperties();
         browserProperties.filter = "txt files (*.txt)|*.txt";
@@ -182,17 +195,29 @@ public class ModeManagerScript : MonoBehaviour
     }
     public void CrackCode()
     {
-        string text = crackingMode.GetComponent<CrackingScript>().TextField.text;
+        string text = crackingMode.GetComponent<ModeScript>().TextField.text;
+        try
+        {
+            if (text == "")
+            {
+                throw new Exception("Please enter text");
+            }
+        }
+        catch (Exception e) 
+        {
+            DisplayError(e.Message);
+            return;
+        }
         int possibleKey = cipherObject.GetKeyWithStatsSimplified(text, language);
         try
         {
-            
-            crackingMode.GetComponent<CrackingScript>().KeyField.text = possibleKey.ToString();
-            crackingMode.GetComponent<CrackingScript>().OutputField.text = cipherObject.CipherText(text, possibleKey, language);
+            crackingMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, possibleKey, language);
+            crackingMode.GetComponent<ModeScript>().KeyField.text = possibleKey.ToString();
         }
         catch (Exception e)
         {
             DisplayError(e.Message);
+
             return;
         }
         //This is the long and most likely broken version
@@ -209,6 +234,7 @@ public class ModeManagerScript : MonoBehaviour
     }
     public void ChangeLanguage()
     {
+        ClearAllFieldsInCurrentMode();
         string dropdownText = languageDropDown.options[languageDropDown.value].text;
         switch (dropdownText)
         {
@@ -220,10 +246,6 @@ public class ModeManagerScript : MonoBehaviour
                 language = CaesarCipher.Languages.Russian;
                 Debug.Log("Switched to russian");
                 break;
-            case "Autodetect":
-                language = CaesarCipher.Languages.NotDecided;
-                Debug.Log("Switched to autodetect");
-                break;
         }
     }
     public void DisplayError(string text)
@@ -234,5 +256,10 @@ public class ModeManagerScript : MonoBehaviour
     public void CloseErrorScreen()
     {
         Errorscreen.SetActive(false);
+    }
+    public void ClearAllFieldsInCurrentMode()
+    {
+        currentMode.GetComponent<ModeScript>().KeyField.text = "";
+        currentMode.GetComponent<ModeScript>().OutputField.text = "";
     }
 }

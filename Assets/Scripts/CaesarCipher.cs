@@ -118,6 +118,10 @@ public class CaesarCipher
     }
     public string CipherText(string text, BigInteger key, Languages language)
     {
+        if (text == "")
+        {
+            throw new Exception("Please enter text");
+        }
         string formatedText = text.ToLower();
         Languages textLanguage = language;
         if (textLanguage == Languages.NotDecided)
@@ -174,13 +178,17 @@ public class CaesarCipher
             }
             else
             {
-                throw new System.Exception("Symbol Detectes");
+                throw new System.Exception("Symbol Detected");
             }
         }
         return cipheredText;
     }
     public string DecipherText(string text, BigInteger key, Languages language)
     {
+        if (text == "")
+        {
+            throw new Exception("Please enter text");
+        }
         string formatedText = text.ToLower();
         Languages textLanguage = language;
         if (textLanguage == Languages.NotDecided)
@@ -292,6 +300,10 @@ public class CaesarCipher
     }
     public int GetKeyWithStatsSimplified(string text,Languages language)
     {
+        if (text == "")
+        {
+            throw new Exception("Please enter text");
+        }
         int possibleKey = 0;
         Languages textLanguage = language;
         if (textLanguage == Languages.NotDecided)
