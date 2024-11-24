@@ -243,10 +243,10 @@ public class CaesarCipher:Cipher
         {
             case Languages.Russian:
                 Debug.Log($"MostFrequentLetter = {mostFrequentLetter}, key:{GetKeyBetweenLetters(mostFrequentLetter, mostFrequentRussianSymbol, language)}");
-                possibleKey = GetKeyBetweenLetters(mostFrequentLetter,mostFrequentRussianSymbol,language);
+                possibleKey = -GetKeyBetweenLetters(mostFrequentLetter,mostFrequentRussianSymbol,language);
                 break;
             case Languages.English:
-                possibleKey = GetKeyBetweenLetters(mostFrequentLetter,mostFrequentEnglishSymbol, language);
+                possibleKey = -GetKeyBetweenLetters(mostFrequentLetter,mostFrequentEnglishSymbol, language);
                 break;
         }
         return possibleKey.ToString();

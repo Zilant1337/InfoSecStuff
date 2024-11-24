@@ -22,13 +22,16 @@ public class ModeManagerScript : MonoBehaviour
     [SerializeField]
     private TMP_Dropdown languageDropDown;
     [SerializeField]
+    private TMP_Dropdown cipherDropDown;
+    [SerializeField]
     private GameObject Errorscreen;
 
     [SerializeField]
     private TMP_Text errortext;
     public Cipher currentCipher;
-    public CaesarCipher cipherObject;
-    public CaesarCipher.Languages language;
+    public CaesarCipher caesarCipher;
+    public VigenereCipher vigenereCipher;
+    public Cipher.Languages language;
 
     public void SwitchMode(GameObject newMode)
     {
@@ -44,7 +47,9 @@ public class ModeManagerScript : MonoBehaviour
     {
         language = CaesarCipher.Languages.Russian;
         currentMode = null;
-        cipherObject = new CaesarCipher();
+        caesarCipher = new CaesarCipher();
+        vigenereCipher = new VigenereCipher();
+        currentCipher = caesarCipher;
     }
     public void CipherBasicInput()
     {
@@ -52,7 +57,7 @@ public class ModeManagerScript : MonoBehaviour
         string keyString = basicCipherMode.GetComponent<ModeScript>().KeyField.text;
         try
         {
-            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, keyString, language);
+            basicCipherMode.GetComponent<ModeScript>().OutputField.text = currentCipher.CipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -66,7 +71,7 @@ public class ModeManagerScript : MonoBehaviour
         string keyString = basicCipherMode.GetComponent<ModeScript>().KeyField.text;
         try
         {
-            basicCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, keyString, language);
+            basicCipherMode.GetComponent<ModeScript>().OutputField.text = currentCipher.DecipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -80,7 +85,7 @@ public class ModeManagerScript : MonoBehaviour
         string keyString = fileCipherMode.GetComponent<ModeScript>().KeyField.text;
         try
         {
-            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, keyString, language);
+            fileCipherMode.GetComponent<ModeScript>().OutputField.text = currentCipher.CipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -95,7 +100,7 @@ public class ModeManagerScript : MonoBehaviour
 
         try
         {
-            fileCipherMode.GetComponent<ModeScript>().OutputField.text = cipherObject.DecipherText(text, keyString, language);
+            fileCipherMode.GetComponent<ModeScript>().OutputField.text = currentCipher.DecipherText(text, keyString, language);
         }
         catch (Exception e)
         {
@@ -116,7 +121,7 @@ public class ModeManagerScript : MonoBehaviour
         try
         {
             string formatedText = fileText.ToLower();
-            if (cipherObject.CheckLanguage(formatedText) ==CaesarCipher.Languages.Russian|| cipherObject.CheckLanguage(fileText) == CaesarCipher.Languages.English)
+            if (currentCipher.CheckLanguage(formatedText) ==CaesarCipher.Languages.Russian|| currentCipher.CheckLanguage(fileText) == CaesarCipher.Languages.English)
             {
                 inputField.text = formatedText;
             }
@@ -170,11 +175,11 @@ public class ModeManagerScript : MonoBehaviour
             DisplayError(e.Message);
             return;
         }
-        string possibleKey = cipherObject.GetProbableKey(text, language);
+        string possibleKey = currentCipher.GetProbableKey(text, language);
 
         try
         {
-            crackingMode.GetComponent<ModeScript>().OutputField.text = cipherObject.CipherText(text, possibleKey.ToString(), language);
+            crackingMode.GetComponent<ModeScript>().OutputField.text = currentCipher.DecipherText(text, possibleKey.ToString(), language);
             crackingMode.GetComponent<ModeScript>().KeyField.text = possibleKey;
         }
         catch (Exception e)
@@ -211,6 +216,22 @@ public class ModeManagerScript : MonoBehaviour
                 break;
         }
     }
+    public void ChangeCipher()
+    {
+        ClearAllFieldsInCurrentMode();
+        string dropdownText = cipherDropDown.options[cipherDropDown.value].text;
+        switch (dropdownText)
+        {
+            case "Caesar":
+                currentCipher = caesarCipher;
+                Debug.Log("Switched to caesar");
+                break;
+            case "Vigenere":
+                currentCipher = vigenereCipher;
+                Debug.Log("Switched to vigenere");
+                break;
+        }
+    }
     public void DisplayError(string text)
     {
         errortext.text = text;
@@ -222,7 +243,9 @@ public class ModeManagerScript : MonoBehaviour
     }
     public void ClearAllFieldsInCurrentMode()
     {
+        if (currentMode != null){
         currentMode.GetComponent<ModeScript>().KeyField.text = "";
-        currentMode.GetComponent<ModeScript>().OutputField.text = "";
+            currentMode.GetComponent<ModeScript>().OutputField.text = "";
+        }
     }
 }

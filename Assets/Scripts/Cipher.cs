@@ -163,6 +163,52 @@ public abstract class Cipher
         }
         return language;
     }
+    public Languages CheckLanguageNoNumbers(string text)
+    {
+        Languages language = Languages.NotDecided;
+        foreach (char c in text)
+        {
+            if (!char.IsLetter(c))
+            {
+                throw new System.Exception("Non-letter detected");
+            }
+            switch (language)
+            {
+                case Languages.English:
+                    if (char.IsLetter(c))
+                    {
+                        if (Regex.IsMatch(c.ToString(), @"\p{IsCyrillic}"))
+                        {
+                            throw new System.Exception("Language inconsistency");
+                        }
+                    }
+                    break;
+                case Languages.Russian:
+                    if (char.IsLetter(c))
+                    {
+                        if (Regex.IsMatch(c.ToString(), @"\p{IsBasicLatin}"))
+                        {
+                            throw new System.Exception("Language inconsistency");
+                        }
+                    }
+                    break;
+                case Languages.NotDecided:
+                    if (char.IsLetter(c))
+                    {
+                        if (Regex.IsMatch(c.ToString(), @"\p{IsCyrillic}"))
+                        {
+                            language = Languages.Russian;
+                        }
+                        else if (Regex.IsMatch(c.ToString(), @"\p{IsBasicLatin}"))
+                        {
+                            language = Languages.English;
+                        }
+                    }
+                    break;
+            }
+        }
+        return language;
+    }
     public int GetKeyBetweenLetters(char letter1, char letter2, Languages language)
     {
         int firstKey = 0;
