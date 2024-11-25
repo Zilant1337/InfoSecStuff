@@ -175,10 +175,10 @@ public class ModeManagerScript : MonoBehaviour
             DisplayError(e.Message);
             return;
         }
-        string possibleKey = currentCipher.GetProbableKey(text, language);
-
+        
         try
         {
+            string possibleKey = currentCipher.GetProbableKey(text, language);
             crackingMode.GetComponent<ModeScript>().OutputField.text = currentCipher.DecipherText(text, possibleKey.ToString(), language);
             crackingMode.GetComponent<ModeScript>().KeyField.text = possibleKey;
         }

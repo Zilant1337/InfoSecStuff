@@ -192,11 +192,10 @@ public class VigenereCipher : Cipher
         }
         int maxKeyLength = 20;
         Dictionary<int, float> probableKeyLengths = new Dictionary<int, float>();
-        
         for (int keyLength = 1; keyLength <= maxKeyLength; keyLength++)
         {
             List<string> textGroups = new List<string>();
-            for(int i = 0; i< text.Length; i ++)
+            for(int i = 0; i< keyLength; i ++)
             {
                 string textGroup="";
                 for (int k =i;k<text.Length;k+= keyLength)
@@ -225,21 +224,21 @@ public class VigenereCipher : Cipher
             switch (language)
             {
                 case Languages.Russian:
-                    if (Math.Abs(keyLen.Value - russianTextIndexOfCoincidence )< smallestDiff)
+                    if (Math.Abs(keyLen.Value - russianTextIndexOfCoincidence) < smallestDiff)
                     {
                         mostProbableKeyLen = keyLen.Key;
                         smallestDiff = Math.Abs(keyLen.Value - russianTextIndexOfCoincidence);
                     }
-                        break;
+                    break;
                 case Languages.English:
-                    if (Math.Abs(keyLen.Value - englishTextIndexOfCoincidence)< smallestDiff)
+                    if (Math.Abs(keyLen.Value - englishTextIndexOfCoincidence) < smallestDiff)
                     {
                         mostProbableKeyLen = keyLen.Key;
                         smallestDiff = Math.Abs(keyLen.Value - russianTextIndexOfCoincidence);
                     }
                     break;
             }
-            
+
         }
         Debug.Log($"Key len: {mostProbableKeyLen}");
         return FormKey(text, language, mostProbableKeyLen);
@@ -256,14 +255,26 @@ public class VigenereCipher : Cipher
             }
         }
         Dictionary<char, int> letterCounts = new Dictionary<char, int>();
+        switch (language)
+        {
+            case Languages.Russian:
+                foreach (var letter in russianSymbolsWithoutNumbers)
+                {
+                    letterCounts.Add(letter, 0);
+                }
+                break;
+            case Languages.English:
+                foreach (var letter in englishSymbolsWithoutNumbers)
+                {
+                    letterCounts.Add(letter, 0);
+                }
+                break;
+        }
+        
         foreach (char c in text)
         {
             if (char.IsLetter(c))
             {
-                if (!letterCounts.ContainsKey(c))
-                {
-                    letterCounts.Add(c, 0);
-                }
                 letterCounts[c]++;
             }
         }
