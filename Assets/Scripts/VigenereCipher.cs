@@ -152,7 +152,7 @@ public class VigenereCipher : Cipher
                         }
                         shiftedIndex = russianSymbolsWithNumbers.IndexOf(c);
                         keyLetterIndex = russianSymbolsWithNumbers.IndexOf(key[i % key.Length]);
-                        if ((shiftedIndex + keyLetterIndex) % russianSymbolsWithNumbers.Count < 0)
+                        if ((shiftedIndex - keyLetterIndex) % russianSymbolsWithNumbers.Count < 0)
                         {
                             shiftedIndex = (shiftedIndex - keyLetterIndex) % russianSymbolsWithNumbers.Count + russianSymbolsWithNumbers.Count;
                         }
@@ -190,7 +190,7 @@ public class VigenereCipher : Cipher
                 throw new System.Exception("Please specify the language");
             }
         }
-        int maxKeyLength = 100;
+        int maxKeyLength = 20;
         Dictionary<int, float> probableKeyLengths = new Dictionary<int, float>();
         
         for (int keyLength = 1; keyLength <= maxKeyLength; keyLength++)
@@ -228,19 +228,20 @@ public class VigenereCipher : Cipher
                     if (Math.Abs(keyLen.Value - russianTextIndexOfCoincidence )< smallestDiff)
                     {
                         mostProbableKeyLen = keyLen.Key;
-                        smallestDiff = keyLen.Value - russianTextIndexOfCoincidence;
+                        smallestDiff = Math.Abs(keyLen.Value - russianTextIndexOfCoincidence);
                     }
                         break;
                 case Languages.English:
                     if (Math.Abs(keyLen.Value - englishTextIndexOfCoincidence)< smallestDiff)
                     {
                         mostProbableKeyLen = keyLen.Key;
-                        smallestDiff = keyLen.Value - russianTextIndexOfCoincidence;
+                        smallestDiff = Math.Abs(keyLen.Value - russianTextIndexOfCoincidence);
                     }
                     break;
             }
             
         }
+        Debug.Log($"Key len: {mostProbableKeyLen}");
         return FormKey(text, language, mostProbableKeyLen);
     }
     public float CalculateIOC(string text, Languages language)
@@ -282,7 +283,7 @@ public class VigenereCipher : Cipher
     public string FormKey(string text, Languages language, int keyLength)
     {
         List<string> textGroups = new List<string>();
-        for (int i = 0; i < text.Length; i++)
+        for (int i = 0; i < keyLength; i++)
         {
             string textGroup = "";
             for (int k = i; k < text.Length; k += keyLength)
@@ -292,13 +293,23 @@ public class VigenereCipher : Cipher
         string finalKey = "";
         foreach (var group in textGroups) 
         {
+            int keyLetter = int.Parse(caesarObject.GetProbableKey(group, language));
             switch (language)
             {
                 case Languages.Russian:
-                    finalKey += russianSymbolsWithNumbers[int.Parse(caesarObject.GetProbableKey(group, language))];
+                    if (keyLetter < 0)
+                    {
+                        keyLetter += russianSymbolsWithNumbers.Count;
+                    }
+                    finalKey += russianSymbolsWithNumbers[keyLetter];
                     break;
                 case Languages.English:
-                    finalKey += englishSymbolsWithNumbers[int.Parse(caesarObject.GetProbableKey(group, language))];
+                    if (keyLetter< 0)
+                    {
+                        keyLetter += englishSymbolsWithNumbers.Count;
+                    }
+
+                    finalKey += englishSymbolsWithNumbers[keyLetter];
                     break;
             }
         }

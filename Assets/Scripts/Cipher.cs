@@ -133,7 +133,7 @@ public abstract class Cipher
                     {
                         if (Regex.IsMatch(c.ToString(), @"\p{IsCyrillic}"))
                         {
-                            throw new System.Exception("Language inconsistency");
+                            throw new System.Exception($"Language inconsistency: {c}" );
                         }
                     }
                     break;
@@ -142,7 +142,7 @@ public abstract class Cipher
                     {
                         if (Regex.IsMatch(c.ToString(), @"\p{IsBasicLatin}"))
                         {
-                            throw new System.Exception("Language inconsistency");
+                            throw new System.Exception($"Language inconsistency: {c}");
                         }
                     }
                     break;
