@@ -8,6 +8,7 @@ using AnotherFileBrowser.Windows;
 using System.IO;
 using UnityEngine.Networking;
 using System.Numerics;
+using UnityEngine.SceneManagement;
 
 public class ModeManagerScript : MonoBehaviour
 {
@@ -247,5 +248,9 @@ public class ModeManagerScript : MonoBehaviour
         currentMode.GetComponent<ModeScript>().KeyField.text = "";
             currentMode.GetComponent<ModeScript>().OutputField.text = "";
         }
+    }
+    public void SwitchToGammas()
+    {
+        SceneManager.LoadScene("GammasScene",LoadSceneMode.Single);
     }
 }
