@@ -23,8 +23,6 @@ public class GammaModeManagerScript : MonoBehaviour
     [SerializeField]
     private TMP_Dropdown languageDropDown;
     [SerializeField]
-    private TMP_Dropdown cipherDropDown;
-    [SerializeField]
     private GameObject Errorscreen;
 
     [SerializeField]
@@ -51,7 +49,53 @@ public class GammaModeManagerScript : MonoBehaviour
     }
     public void BasicXORCipher()
     {
-        
+        try
+        {
+            string text = basicCipherMode.GetComponent<BasicCipherMode>().inputTextField.text.ToLower();
+            string key = basicCipherMode.GetComponent<BasicCipherMode>().keyField.text.ToLower();
+            if(text == "")
+            {
+                throw new Exception("Please input text");
+            }
+            if (key == "")
+            {
+                throw new Exception("Please input key");
+            }
+            string binaryText = xorCipher.GetBinary(text,language);
+            string binaryKey = xorCipher.GetBinary(key,language);
+            basicCipherMode.GetComponent<BasicCipherMode>().binaryInputTextField.text = binaryText;
+            basicCipherMode.GetComponent<BasicCipherMode>().keyBinaryField.text = binaryKey;
+            basicCipherMode.GetComponent<BasicCipherMode>().gammaField.text = xorCipher.XOR(binaryText,binaryKey);
+            
+        }
+        catch (Exception e) 
+        {
+            DisplayError(e.Message);
+        }
+    }
+    public void BasicXORDecipher()
+    {
+        try
+        {
+            string gamma = basicCipherMode.GetComponent<BasicCipherMode>().gammaField.text;
+            string binaryKey = basicCipherMode.GetComponent<BasicCipherMode>().keyBinaryField.text;
+            if (gamma == ""||binaryKey== "")
+            {
+                throw new Exception("Please cipher the text first");
+            }
+
+            basicCipherMode.GetComponent<BasicCipherMode>().binaryDecipheredField.text = xorCipher.XOR(gamma, binaryKey);
+            basicCipherMode.GetComponent<BasicCipherMode>().decipheredTextField.text = xorCipher.GetTextFromBinary(basicCipherMode.GetComponent<BasicCipherMode>().binaryDecipheredField.text, language);
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+        }
+    }
+    public void DublicateAsBinary(TMP_InputField from, TMP_InputField to)
+    {
+        if(from.text!="")
+            to.text =xorCipher.GetBinary(from.text,language); 
     }
    
     public void ChangeLanguage()

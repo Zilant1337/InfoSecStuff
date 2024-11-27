@@ -122,7 +122,7 @@ public class ModeManagerScript : MonoBehaviour
         try
         {
             string formatedText = fileText.ToLower();
-            if (currentCipher.CheckLanguage(formatedText) ==CaesarCipher.Languages.Russian|| currentCipher.CheckLanguage(fileText) == CaesarCipher.Languages.English)
+            if (Cipher.CheckLanguage(formatedText) ==CaesarCipher.Languages.Russian|| Cipher.CheckLanguage(fileText) == CaesarCipher.Languages.English)
             {
                 inputField.text = formatedText;
             }

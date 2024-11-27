@@ -117,7 +117,7 @@ public abstract class Cipher
     public abstract string CipherText(string text, string keyString, Languages language);
     public abstract string DecipherText(string text, string keyString, Languages language);
     public abstract string GetProbableKey(string text, Languages language);
-    public Languages CheckLanguage(string text)
+    public static Languages CheckLanguage(string text)
     {
         Languages language = Languages.NotDecided;
         foreach (char c in text)
@@ -163,7 +163,7 @@ public abstract class Cipher
         }
         return language;
     }
-    public Languages CheckLanguageNoNumbers(string text)
+    public static Languages CheckLanguageNoNumbers(string text)
     {
         Languages language = Languages.NotDecided;
         foreach (char c in text)
