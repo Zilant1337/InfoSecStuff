@@ -242,7 +242,7 @@ public class GammaModeManagerScript : MonoBehaviour
             DisplayError(e.Message);
         }
     }
-   
+
     public void ChangeLanguage()
     {
         string dropdownText = languageDropDown.options[languageDropDown.value].text;

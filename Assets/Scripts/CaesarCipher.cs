@@ -219,7 +219,7 @@ public class CaesarCipher:Cipher
         Dictionary<char, int> letterCounts = new Dictionary<char, int>();
         foreach (char c in text)
         {
-            if (char.IsLetter(c))
+            if (char.IsLetter(c)||char.IsDigit(c))
             {
                 if (!letterCounts.ContainsKey(c))
                 {
@@ -242,7 +242,6 @@ public class CaesarCipher:Cipher
         switch (textLanguage)
         {
             case Languages.Russian:
-                Debug.Log($"MostFrequentLetter = {mostFrequentLetter}, key:{GetKeyBetweenLetters(mostFrequentLetter, mostFrequentRussianSymbol, language)}");
                 possibleKey = -GetKeyBetweenLetters(mostFrequentLetter,mostFrequentRussianSymbol,language);
                 break;
             case Languages.English:
