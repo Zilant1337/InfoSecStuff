@@ -232,8 +232,15 @@ public class GammaModeManagerScript : MonoBehaviour
     }
     public void DublicateAsBinary(TMP_InputField from, TMP_InputField to)
     {
-        if(from.text!="")
-            to.text =xorCipher.GetBinary(from.text.ToLower(),language); 
+        try
+        {
+            if (from.text != "")
+                to.text = xorCipher.GetBinary(from.text.ToLower(), language);
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+        }
     }
    
     public void ChangeLanguage()

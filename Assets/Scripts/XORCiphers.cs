@@ -275,7 +275,7 @@ public class XORCiphers
         {
             string nextBlock = XOR(block, iv);
             decipheredText += nextBlock;
-            iv = nextBlock;
+            iv = block;
         }
         return decipheredText;
     }
