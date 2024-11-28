@@ -105,7 +105,7 @@ public class XORCiphers
             throw new System.Exception("Please insert text");
         }
         Cipher.Languages verifyLanguage = Cipher.CheckLanguage(text);
-        if (language != verifyLanguage)
+        if (language != verifyLanguage && verifyLanguage!=Cipher.Languages.NotDecided)
         {
             throw new System.Exception("Language mismatch");
         }
@@ -194,7 +194,7 @@ public class XORCiphers
         int bin1Length= binary1.Length;
         int bin2Length= binary2.Length;
         
-        switch (bin1Length>=bin2Length)
+        switch (bin1Length>bin2Length)
         {
             case true:
                 for (int i = 0; i < bin1Length; i++)
@@ -210,9 +210,9 @@ public class XORCiphers
                 }
                 break;
             case false:
-                for (int i = 0; i < bin2Length; i++)
+                for (int i = 0; i < bin1Length; i++)
                 {
-                    if (binary2[i] != binary1[i % bin1Length])
+                    if (binary1[i] != binary2[i])
                     {
                         xorResult += '1';
                     }
@@ -223,9 +223,63 @@ public class XORCiphers
                 }
                 break;
         }
+        
         return xorResult;
     }
-    public static string GeneratePerfectGamma(int length)
+    public List<string> BinaryIntoBlocks(string text)
+    {
+        List<string> result = new List<string>();
+        for (int i = 0; i < text.Length; i += 6)
+        {
+            result.Add(text[i..(i + 6)]); ;
+        }
+        return result;
+    }
+    public string CascadeCiphering(string text, string key, string gamma)
+    {
+        if (text == "" || key == "" || gamma == "")
+        {
+            throw new Exception("One of the strings is empty");
+        }
+        if (!CheckIfBinary(text) && !CheckIfBinary(key) && !CheckIfBinary(key))
+        {
+            throw new Exception("One of the strings is not binary");
+        }
+        string cipheredText = "";
+        List<string> blocks = BinaryIntoBlocks(text);
+        string iv = XOR(gamma, key);
+        foreach (string block in blocks)
+        {
+            string nextBlock = XOR(block, iv);
+            cipheredText += nextBlock;
+            iv = nextBlock;
+        }
+        return cipheredText;
+    }
+    
+
+    public string CascadeDeciphering(string text, string key, string gamma)
+    {
+        if (text == "" || key == "")
+        {
+            throw new Exception("One of the strings is empty");
+        }
+        if (!CheckIfBinary(text) && !CheckIfBinary(key))
+        {
+            throw new Exception("One of the strings is not binary");
+        }
+        string decipheredText = "";
+        List<string> blocks = BinaryIntoBlocks(text);
+        string iv = XOR(gamma,key);
+        foreach (string block in blocks)
+        {
+            string nextBlock = XOR(block, iv);
+            decipheredText += nextBlock;
+            iv = nextBlock;
+        }
+        return decipheredText;
+    }
+    public string GeneratePerfectGamma(int length)
     {
         if (length % 2 != 0)
         {
@@ -243,9 +297,10 @@ public class XORCiphers
             }
 
             int[] binaryData = data.Select(x => x > 0 ? 1 : 0).ToArray();
-
+            Debug.Log(string.Concat(binaryData));
             if (binaryData.Count(x => x == 1) ==  binaryData.Count(x => x == 0))
             {
+                Debug.Log("Success!");
                 return string.Concat(binaryData);
             }
         }
@@ -257,5 +312,11 @@ public class XORCiphers
         double u2 = 1.0 - random.NextDouble();
         double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
         return mean + stdDev * randStdNormal;
+    }
+    public string ReverseString(string input)
+    {
+        char[] charArray = input.ToCharArray();
+        Array.Reverse(charArray);
+        return new string(charArray);
     }
 }

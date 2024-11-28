@@ -6,6 +6,8 @@ using UnityEngine;
 public class BasicCipherMode : MonoBehaviour
 {
     [SerializeField]
+    private GammaModeManagerScript m_GammaModeManagerScript;
+    [SerializeField]
     public TMP_InputField inputTextField;
     [SerializeField]
     public TMP_InputField binaryInputTextField;
@@ -19,4 +21,13 @@ public class BasicCipherMode : MonoBehaviour
     public TMP_InputField decipheredTextField;
     [SerializeField]
     public TMP_InputField binaryDecipheredField;
+
+    public void DublicateTextAsBinary()
+    {
+        m_GammaModeManagerScript.DublicateAsBinary(inputTextField, binaryInputTextField);
+    }
+    public void DublicateKeyAsBinary()
+    {
+        m_GammaModeManagerScript.DublicateAsBinary(keyField, keyBinaryField);
+    }
 }

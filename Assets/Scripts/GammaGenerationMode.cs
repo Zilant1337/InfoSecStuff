@@ -1,18 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GammaGenerationMode : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]
+    private GammaModeManagerScript m_GammaModeManagerScript;
+    [SerializeField]
+    public TMP_InputField inputTextField;
+    [SerializeField]
+    public TMP_InputField binaryInputTextField;
+    [SerializeField]
+    public TMP_InputField keyBinaryField;
+    [SerializeField]
+    public TMP_InputField gammaField;
+    [SerializeField]
+    public TMP_InputField decipheredTextField;
+    [SerializeField]
+    public TMP_InputField binaryDecipheredField;
+    public void DublicateTextAsBinary()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        m_GammaModeManagerScript.DublicateAsBinary(inputTextField, binaryInputTextField);
     }
 }

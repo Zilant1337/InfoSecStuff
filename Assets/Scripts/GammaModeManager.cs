@@ -92,15 +92,152 @@ public class GammaModeManagerScript : MonoBehaviour
             DisplayError(e.Message);
         }
     }
+    public void GammaGenerationCipher()
+    {
+        try
+        {
+            string text = gammaGenerationMode.GetComponent<GammaGenerationMode>().inputTextField.text.ToLower();
+            string key = gammaGenerationMode.GetComponent<GammaGenerationMode>().keyBinaryField.text;
+            if (text == "")
+            {
+                throw new Exception("Please input text");
+            }
+            if (key == "")
+            {
+                throw new Exception("Please generate key");
+            }
+            string binaryText = xorCipher.GetBinary(text, language);
+            gammaGenerationMode.GetComponent<GammaGenerationMode>().binaryInputTextField.text = binaryText;
+            gammaGenerationMode.GetComponent<GammaGenerationMode>().gammaField.text = xorCipher.XOR(binaryText, key);
+
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+        }
+    }
+    public void GammaGenerationDecipher()
+    {
+        try
+        {
+            string gamma = gammaGenerationMode.GetComponent<GammaGenerationMode>().gammaField.text;
+            string binaryKey = gammaGenerationMode.GetComponent<GammaGenerationMode>().keyBinaryField.text;
+            if (gamma == "" || binaryKey == "")
+            {
+                throw new Exception("Please cipher the text first");
+            }
+
+            gammaGenerationMode.GetComponent<GammaGenerationMode>().binaryDecipheredField.text = xorCipher.XOR(gamma, binaryKey);
+            gammaGenerationMode.GetComponent<GammaGenerationMode>().decipheredTextField.text = xorCipher.GetTextFromBinary(gammaGenerationMode.GetComponent<GammaGenerationMode>().binaryDecipheredField.text, language);
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+        }
+    }
+    public void GammaGenerationGenerate()
+    {
+        try
+        {
+            string text = gammaGenerationMode.GetComponent<GammaGenerationMode>().binaryInputTextField.text;
+            if(text == "")
+            {
+                throw new Exception("Please input text");
+            }
+            if (Cipher.CheckLanguage(text.ToLower()) != language && Cipher.CheckLanguage(text.ToLower()) != Cipher.Languages.NotDecided)
+            {
+                throw new Exception("Language mismatch");
+            }
+            string gamma = xorCipher.GeneratePerfectGamma(text.Length);
+            gammaGenerationMode.GetComponent<GammaGenerationMode>().keyBinaryField.text = gamma;
+        }
+        catch(Exception e)
+        {
+            DisplayError(e.Message);
+        }
+    }
+    public void LinkageCipherCipher()
+    {
+        try
+        {
+            string text = linkageCipherMode.GetComponent<LinkageCipherMode>().inputTextField.text.ToLower();
+            string key = linkageCipherMode.GetComponent<LinkageCipherMode>().keyField.text;
+            string gamma = linkageCipherMode.GetComponent<LinkageCipherMode>().gammaField.text;
+            if (text == "")
+            {
+                throw new Exception("Please input text");
+            }
+            if (key == "")
+            {
+                throw new Exception("Please input key");
+            }
+            if(gamma == "")
+            {
+                throw new Exception("Please generate gamma");
+            }
+            string binaryText = xorCipher.GetBinary(text, language);
+            string binaryKey = xorCipher.GetBinary(key, language);
+            linkageCipherMode.GetComponent<LinkageCipherMode>().binaryInputTextField.text = binaryText;
+            linkageCipherMode.GetComponent<LinkageCipherMode>().keyBinaryField.text = binaryKey;
+            linkageCipherMode.GetComponent<LinkageCipherMode>().IV2Field.text = xorCipher.XOR(gamma, binaryKey);
+            string cipheredBinary = xorCipher.CascadeCiphering(binaryText, binaryKey, gamma);
+            linkageCipherMode.GetComponent<LinkageCipherMode>().binaryCipheredField.text = xorCipher.CascadeCiphering(binaryText,binaryKey,gamma);
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+        }
+    }
+    public void LinkageCipherDecipher()
+    {
+        try
+        {
+            string gamma = linkageCipherMode.GetComponent<LinkageCipherMode>().gammaField.text;
+            string binaryKey = linkageCipherMode.GetComponent<LinkageCipherMode>().keyBinaryField.text;
+            string cipheredBinary = linkageCipherMode.GetComponent<LinkageCipherMode>().binaryCipheredField.text;
+            if (gamma == "" || binaryKey == "" || cipheredBinary == "")
+            {
+                throw new Exception("Please cipher the text first");
+            }
+
+            string decipheredBinary = xorCipher.CascadeDeciphering(cipheredBinary, binaryKey, gamma);
+            linkageCipherMode.GetComponent<LinkageCipherMode>().binaryDecipheredField.text = decipheredBinary;
+            linkageCipherMode.GetComponent<LinkageCipherMode>().decipheredTextField.text = xorCipher.GetTextFromBinary(decipheredBinary, language);
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+        }
+    }
+    public void LinkageCipherGenerate()
+    {
+        try
+        {
+            string text = linkageCipherMode.GetComponent<LinkageCipherMode>().binaryInputTextField.text;
+            if (text == "")
+            {
+                throw new Exception("Please input text");
+            }
+            if (Cipher.CheckLanguage(text.ToLower()) != language && Cipher.CheckLanguage(text.ToLower()) != Cipher.Languages.NotDecided)
+            {
+                throw new Exception("Language mismatch");
+            }
+            string gamma = xorCipher.GeneratePerfectGamma(text.Length);
+            linkageCipherMode.GetComponent<LinkageCipherMode>().gammaField.text = gamma;
+        }
+        catch (Exception e)
+        {
+            DisplayError(e.Message);
+        }
+    }
     public void DublicateAsBinary(TMP_InputField from, TMP_InputField to)
     {
         if(from.text!="")
-            to.text =xorCipher.GetBinary(from.text,language); 
+            to.text =xorCipher.GetBinary(from.text.ToLower(),language); 
     }
    
     public void ChangeLanguage()
     {
-        ClearAllFieldsInCurrentMode();
         string dropdownText = languageDropDown.options[languageDropDown.value].text;
         switch (dropdownText)
         {
@@ -123,15 +260,8 @@ public class GammaModeManagerScript : MonoBehaviour
     {
         Errorscreen.SetActive(false);
     }
-    public void ClearAllFieldsInCurrentMode()
-    {
-        if (currentMode != null){
-        currentMode.GetComponent<ModeScript>().KeyField.text = "";
-            currentMode.GetComponent<ModeScript>().OutputField.text = "";
-        }
-    }
     public void SwitchToNormal()
     {
         SceneManager.LoadScene("VigenereCaesarScene", LoadSceneMode.Single);
-    }
+    }   
 }
